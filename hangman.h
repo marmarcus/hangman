@@ -2,20 +2,30 @@
 #define HANGMAN_H_
 
 #include <iostream>
-#include <string>
 #include <fstream>
-#include <cstdlib>
+#include <string>
 
-class hangman
-{
+class hangman{
 public:
-    static void start();
+    void start();
 private:
-    static std::string rand_word();
-    static int numWords();
-    static void show_board(int);
-    static char getGuess();
-    static std::string handleGuess(char);
+    std::string answer;
+    std::string guess;
+
+    char letter;
+
+    int lives = 6;
+
+    bool win = false;
+    bool lose = false;
+
+    void randWord();
+    int numWords();
+    void initialize();
+    void showBoard();
+    void getGuess();
+    void handleGuess();
+
 };
 
 #endif

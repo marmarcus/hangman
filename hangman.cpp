@@ -3,11 +3,6 @@
 void hangman::start() {
     //variables
     int mode;
-    int lives = 6;
-    int badAttempts = 0;
-    std::string ansWord;
-    bool win = false;
-    bool lose = false;
 
     //intro
     std::cout << "\t~~Welcome to Hangman!~~\n" << std::endl;
@@ -17,29 +12,55 @@ void hangman::start() {
     std::cin >> mode;
     switch(mode){
         case 1: // Random Word
-            ansWord = rand_word();
+            randWord();
             break;
         case 2: // Custom Word
             std::cout << "Enter a custom word: ";
-            std::cin >> ansWord;
+            std::cin >> answer;
             break;
         default:
             std::cout << "Invalid Option\nProgram Terminating.." << std::endl;
     }
-    
+
+    for(int i = 0; i < answer.size(); i++){ // make every letter lowercase
+        answer[i] = tolower(answer[i]);
+    }
+
     std::cout << "\nStarting Game..\n" << std::endl;
 
+    initialize(); // sets up the placeholders in the "guess" variable
+
     while(!win && !lose){
-        show_board(badAttempts);
+        showBoard();
+
+        std::cout << "There are " << answer.size() << " letters in the word.\n" << std::endl;
+        std::cout << "You have " << lives << " guesses left!" << std::endl;
+        std::cout << "Your current guess has: " << guess << "\n" << std::endl;
+
         getGuess();
-        win = true;
+        handleGuess();
+
+        if((guess == answer) && (lives > 0)) {
+            win = true;
+        }
+        else if(lives == 0){
+            lose = true;
+        }
+    }
+
+    if(lose){
+        showBoard(); 
+        std::cout << "You lose! :(\nThe correct word was " << answer <<  ".\nBetter luck next time.." << std::endl;
+    }
+
+    if(win){
+        std::cout << "Congrats, you won!\nYour word was " << guess << std::endl;
     }
 }
 
-//-----------------------------------------------------------------------------------------------------------
+//---------------------------------------------------------------------------------------------
 
-std::string hangman::rand_word() {
-    std::string word;
+void hangman::randWord() {
     std::ifstream wordFile("words.txt");
     int line;
 
@@ -48,12 +69,10 @@ std::string hangman::rand_word() {
 
     while(wordFile.is_open()){
         for(int i = 0; i < line; i++){
-            std::getline(wordFile, word);
+            std::getline(wordFile, answer);
         }
         wordFile.close();
     }
-
-    return word;
 }
 
 int hangman::numWords() {
@@ -65,14 +84,19 @@ int hangman::numWords() {
         while (std::getline(wordFile, line)) {
             lineCount++;
         }
-
         wordFile.close();
-    
+
         return lineCount;
-    }return 0;
+    }return 0;    
 }
 
-void hangman::show_board(int badTries) {
+void hangman::initialize() {
+    for(int i = 0; i < answer.size(); i++){
+        guess.push_back('-');
+    }
+}
+
+void hangman::showBoard() {
     std::string boards[7] = {
         "  +-----+\n"
         "  |     |\n"
@@ -125,18 +149,26 @@ void hangman::show_board(int badTries) {
         "###########\n"
     };
 
-    std::cout << boards[badTries] << std::endl;
+    std::cout << "\n" << boards[6 - lives] << std::endl;
 }
 
-char hangman::getGuess() {
-    char guess;
-
+void hangman::getGuess() {
     std::cout << "Guess a letter: ";
-    std::cin >> guess;
-
-    return guess;
+    std::cin >> letter;
+    std::cout << std::endl;
 }
 
-std::string hangman::handleGuess(char guess) {
-    
+void hangman::handleGuess() {
+    bool flag = false;
+
+    for(int i = 0; i < answer.size(); i++){
+        if(tolower(letter) == answer[i]){
+            guess[i] = tolower(letter);
+            flag = true;
+        }
+    }
+
+    if(!flag){
+        lives--;
+    }
 }

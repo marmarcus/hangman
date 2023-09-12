@@ -1,5 +1,6 @@
 #include "hangman.h"
 
 int main(){
-    hangman::start();
+    hangman game;
+    game.start();
 }
